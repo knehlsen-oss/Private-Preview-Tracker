@@ -1,0 +1,971 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Private Preview & Design Partner Tracker</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f7fb;
+        --card: #ffffff;
+        --muted: #5b6171;
+        --text: #131722;
+        --primary: #2f6fed;
+        --border: #dce1ee;
+        --warn: #b7791f;
+        --risk: #b42318;
+        --ok: #0f7b3e;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      header {
+        background: #1d2333;
+        color: #fff;
+        padding: 1.2rem 1.6rem;
+      }
+
+      header h1 {
+        margin: 0 0 0.35rem 0;
+        font-size: 1.4rem;
+      }
+
+      header p {
+        margin: 0;
+        color: #d9e0f5;
+        max-width: 1000px;
+      }
+
+      main {
+        max-width: 1240px;
+        margin: 1rem auto 2rem;
+        padding: 0 1rem;
+        display: grid;
+        gap: 1rem;
+      }
+
+      section {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1rem;
+      }
+
+      h2 {
+        margin: 0 0 0.9rem;
+        font-size: 1.1rem;
+      }
+
+      h3 {
+        margin: 1rem 0 0.5rem;
+        font-size: 0.97rem;
+      }
+
+      .hint {
+        color: var(--muted);
+        margin: 0.3rem 0 0.8rem;
+      }
+
+      .grid {
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .grid.cols-2 {
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      }
+
+      .grid.cols-3 {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+
+      .field {
+        display: grid;
+        gap: 0.35rem;
+      }
+
+      label {
+        color: #283041;
+        font-weight: 600;
+        font-size: 0.88rem;
+      }
+
+      input,
+      select,
+      textarea,
+      button {
+        font: inherit;
+      }
+
+      input,
+      select,
+      textarea {
+        padding: 0.48rem 0.58rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      textarea {
+        min-height: 76px;
+        resize: vertical;
+      }
+
+      button {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.45rem 0.7rem;
+        background: #fff;
+        cursor: pointer;
+      }
+
+      button.primary {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+      }
+
+      button.small {
+        padding: 0.25rem 0.45rem;
+        font-size: 0.81rem;
+      }
+
+      .metrics {
+        display: grid;
+        gap: 0.55rem;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+
+      .metric {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.6rem;
+        background: #fbfcff;
+      }
+
+      .metric .value {
+        display: block;
+        font-size: 1.25rem;
+        font-weight: 700;
+      }
+
+      .definition-card {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.6rem;
+        background: #fbfcff;
+      }
+
+      .definition-card h4 {
+        margin: 0 0 0.4rem;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.88rem;
+      }
+
+      th,
+      td {
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        padding: 0.42rem 0.32rem;
+        vertical-align: top;
+      }
+
+      th {
+        color: #2e3646;
+      }
+
+      .badge {
+        display: inline-block;
+        border-radius: 999px;
+        padding: 0.15rem 0.48rem;
+        font-size: 0.75rem;
+        border: 1px solid var(--border);
+        background: #f5f7fc;
+      }
+
+      .badge.pending {
+        color: #8c620e;
+        border-color: #f0dfb5;
+        background: #fff8ea;
+      }
+
+      .badge.approved {
+        color: #116633;
+        border-color: #c8ebd5;
+        background: #eefcf3;
+      }
+
+      .badge.rejected {
+        color: #9f2d1c;
+        border-color: #f0ccc6;
+        background: #fff1ef;
+      }
+
+      .risk-high {
+        color: var(--risk);
+        font-weight: 700;
+      }
+
+      .risk-medium {
+        color: var(--warn);
+        font-weight: 700;
+      }
+
+      .risk-low {
+        color: var(--ok);
+        font-weight: 700;
+      }
+
+      .inline-actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-top: 0.2rem;
+      }
+
+      .status-line {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      progress {
+        width: 120px;
+        height: 10px;
+      }
+
+      .message {
+        min-height: 1.1rem;
+        margin: 0;
+        color: #254693;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Private Preview & Design Partner Tracker</h1>
+      <p>
+        One source of truth for OpenGov teams to request, approve, run, maintain, and close customer
+        partnerships while avoiding over-contact and relationship strain.
+      </p>
+    </header>
+    <main>
+      <section>
+        <h2>Program Definitions & Portfolio Snapshot</h2>
+        <div id="programDefinitions" class="grid cols-2"></div>
+        <h3>Current Portfolio</h3>
+        <div id="dashboardMetrics" class="metrics"></div>
+        <h3>Customer Contact Load Monitor</h3>
+        <p class="hint">
+          Flag customers with multiple concurrent engagements to prevent negative relationship impact.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Active Partnerships</th>
+              <th>Pending Nominations</th>
+              <th>Total Engagement Load</th>
+              <th>Risk</th>
+              <th>Last Interaction</th>
+            </tr>
+          </thead>
+          <tbody id="customerLoadRows"></tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Customer Nomination Request (New Partnership)</h2>
+        <p class="hint">
+          Submit a nomination for Design Partner or Private Preview with guardrails for coordinated outreach.
+        </p>
+        <form id="nominationForm" class="grid cols-3">
+          <div class="field">
+            <label for="nominationCustomerName">Customer Name</label>
+            <input id="nominationCustomerName" name="customerName" required />
+          </div>
+          <div class="field">
+            <label for="nominationCustomerSegment">Customer Segment</label>
+            <input id="nominationCustomerSegment" name="customerSegment" placeholder="Municipality" />
+          </div>
+          <div class="field">
+            <label for="nominationProductTeam">Product Team</label>
+            <select id="nominationProductTeam" name="productTeam" required></select>
+          </div>
+          <div class="field">
+            <label for="nominationProgramType">Requested Program</label>
+            <select id="nominationProgramType" name="requestedProgramType" required></select>
+          </div>
+          <div class="field">
+            <label for="nominationRequester">Requester Name</label>
+            <input id="nominationRequester" name="requesterName" required />
+          </div>
+          <div class="field">
+            <label for="nominationContactName">Customer Contact Name</label>
+            <input id="nominationContactName" name="contactName" />
+          </div>
+          <div class="field">
+            <label for="nominationContactEmail">Customer Contact Email</label>
+            <input id="nominationContactEmail" name="contactEmail" type="email" />
+          </div>
+          <div class="field">
+            <label for="nominationRequestedAt">Requested Date</label>
+            <input id="nominationRequestedAt" name="requestedAt" type="date" />
+          </div>
+          <div class="field">
+            <label for="nominationRequestType">Request Type</label>
+            <select id="nominationRequestType" name="requestType">
+              <option>New Partnership</option>
+              <option>Document Existing</option>
+            </select>
+          </div>
+          <div class="field" style="grid-column: 1 / -1">
+            <label for="nominationRationale">Rationale</label>
+            <textarea id="nominationRationale" name="rationale" required></textarea>
+          </div>
+          <div class="field" style="grid-column: 1 / -1">
+            <label for="nominationGuardrails">Relationship Guardrails</label>
+            <textarea
+              id="nominationGuardrails"
+              name="relationshipGuardrails"
+              placeholder="e.g. Route all outreach through CSM, cap touchpoints to bi-weekly..."
+            ></textarea>
+          </div>
+          <div style="grid-column: 1 / -1">
+            <button class="primary" type="submit">Submit Nomination</button>
+          </div>
+        </form>
+      </section>
+
+      <section>
+        <h2>Nomination Queue & Sign-Offs (R&amp;D, CS, PS)</h2>
+        <p class="hint">
+          A nomination must be approved by all three groups before activation into an active partnership.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Nomination</th>
+              <th>Status</th>
+              <th>R&amp;D</th>
+              <th>CS</th>
+              <th>PS</th>
+            </tr>
+          </thead>
+          <tbody id="nominationRows"></tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Document Existing Partnership / Activate Approved Nomination</h2>
+        <p class="hint">
+          Use this to enter pre-existing partnerships or convert approved nominations into active tracking.
+        </p>
+        <form id="partnershipForm" class="grid cols-3">
+          <div class="field">
+            <label for="partnershipNominationId">Approved Nomination (optional)</label>
+            <select id="partnershipNominationId" name="nominationId">
+              <option value="">None</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="partnershipCustomerName">Customer Name</label>
+            <input id="partnershipCustomerName" name="customerName" required />
+          </div>
+          <div class="field">
+            <label for="partnershipProductTeam">Product Team</label>
+            <select id="partnershipProductTeam" name="productTeam" required></select>
+          </div>
+          <div class="field">
+            <label for="partnershipProgramType">Program Type</label>
+            <select id="partnershipProgramType" name="programType" required></select>
+          </div>
+          <div class="field">
+            <label for="partnershipOwner">Owner</label>
+            <input id="partnershipOwner" name="owner" required />
+          </div>
+          <div class="field">
+            <label for="partnershipStatus">Status</label>
+            <select id="partnershipStatus" name="status"></select>
+          </div>
+          <div class="field">
+            <label for="partnershipCadence">Feedback Cadence</label>
+            <input id="partnershipCadence" name="feedbackCadence" placeholder="Bi-weekly" />
+          </div>
+          <div class="field">
+            <label for="partnershipHealth">Feedback Loop Health</label>
+            <select id="partnershipHealth" name="feedbackLoopHealth">
+              <option>On Track</option>
+              <option>Needs Attention</option>
+              <option>At Risk</option>
+              <option>Complete</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="partnershipStartDate">Start Date</label>
+            <input id="partnershipStartDate" name="startDate" type="date" />
+          </div>
+          <div class="field">
+            <label for="partnershipTargetEndDate">Target End Date</label>
+            <input id="partnershipTargetEndDate" name="targetEndDate" type="date" />
+          </div>
+          <div class="field" style="grid-column: 1 / -1">
+            <label for="partnershipObjective">Objective</label>
+            <textarea id="partnershipObjective" name="objective" required></textarea>
+          </div>
+          <div style="grid-column: 1 / -1">
+            <button class="primary" type="submit">Save Partnership</button>
+          </div>
+        </form>
+      </section>
+
+      <section>
+        <h2>Partnership Registry (Progress, Maintenance, and Closure)</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Customer / Team</th>
+              <th>Program</th>
+              <th>Status</th>
+              <th>Progress</th>
+              <th>Feedback Loop</th>
+              <th>Cadence</th>
+              <th>Last / Next Touchpoint</th>
+              <th>End State</th>
+            </tr>
+          </thead>
+          <tbody id="partnershipRows"></tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Interaction Log</h2>
+        <form id="interactionForm" class="grid cols-3">
+          <div class="field">
+            <label for="interactionPartnershipId">Partnership</label>
+            <select id="interactionPartnershipId" name="partnershipId" required></select>
+          </div>
+          <div class="field">
+            <label for="interactionDate">Interaction Date</label>
+            <input id="interactionDate" name="interactionDate" type="date" />
+          </div>
+          <div class="field">
+            <label for="interactionOwner">Owner</label>
+            <input id="interactionOwner" name="owner" required />
+          </div>
+          <div class="field">
+            <label for="interactionChannel">Channel</label>
+            <select id="interactionChannel" name="channel">
+              <option>Email</option>
+              <option>Zoom</option>
+              <option>Phone</option>
+              <option>Onsite</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="interactionSignal">Signal</label>
+            <select id="interactionSignal" name="feedbackSignal">
+              <option>Positive</option>
+              <option>Neutral</option>
+              <option>Needs Support</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="interactionNextFollowUpDate">Next Follow-up Date</label>
+            <input id="interactionNextFollowUpDate" name="nextFollowUpDate" type="date" />
+          </div>
+          <div class="field" style="grid-column: 1 / -1">
+            <label for="interactionSummary">Summary</label>
+            <textarea id="interactionSummary" name="summary" required></textarea>
+          </div>
+          <div class="field" style="grid-column: 1 / -1">
+            <label for="interactionActionItems">Action Items</label>
+            <textarea id="interactionActionItems" name="actionItems"></textarea>
+          </div>
+          <div style="grid-column: 1 / -1">
+            <button class="primary" type="submit">Log Interaction</button>
+          </div>
+        </form>
+        <h3>Recent Interactions</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Customer / Team</th>
+              <th>Channel</th>
+              <th>Summary</th>
+              <th>Signal</th>
+              <th>Next Follow-up</th>
+            </tr>
+          </thead>
+          <tbody id="interactionRows"></tbody>
+        </table>
+      </section>
+      <p id="message" class="message"></p>
+    </main>
+
+    <script>
+      const ROLE_LABELS = { rd: "R&D", cs: "CS", ps: "PS" };
+      const state = {
+        productTeams: [],
+        programDefinitions: [],
+        partnershipStatuses: [],
+        customers: [],
+        nominations: [],
+        partnerships: [],
+        interactions: [],
+        dashboard: {},
+      };
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;");
+      }
+
+      function asDate(value) {
+        return value ? value : "-";
+      }
+
+      function showMessage(text, isError = false) {
+        const message = document.getElementById("message");
+        message.textContent = text;
+        message.style.color = isError ? "#b42318" : "#254693";
+      }
+
+      function statusBadgeClass(status) {
+        if (status.toLowerCase().includes("rejected")) {
+          return "rejected";
+        }
+        if (status.toLowerCase().includes("approved") || status.toLowerCase().includes("converted")) {
+          return "approved";
+        }
+        return "pending";
+      }
+
+      async function api(url, options = {}) {
+        const mergedOptions = { ...options };
+        if (options.body && !options.headers) {
+          mergedOptions.headers = { "Content-Type": "application/json" };
+        }
+        const response = await fetch(url, mergedOptions);
+        if (!response.ok) {
+          const payload = await response.json().catch(() => ({}));
+          throw new Error(payload.error || "Request failed.");
+        }
+        return response.json();
+      }
+
+      function formToObject(formElement) {
+        const formData = new FormData(formElement);
+        const payload = {};
+        for (const [key, value] of formData.entries()) {
+          if (typeof value === "string" && value.trim() !== "") {
+            payload[key] = value.trim();
+          }
+        }
+        return payload;
+      }
+
+      function renderProgramDefinitions() {
+        const container = document.getElementById("programDefinitions");
+        container.innerHTML = state.programDefinitions
+          .map(
+            (definition) => `
+              <article class="definition-card">
+                <h4>${escapeHtml(definition.label)}</h4>
+                <p>${escapeHtml(definition.description)}</p>
+                <p><strong>Expected motion:</strong> ${escapeHtml(definition.expectation)}</p>
+              </article>
+            `,
+          )
+          .join("");
+      }
+
+      function renderDashboardMetrics() {
+        const dashboard = state.dashboard;
+        const entries = [
+          ["Customers", dashboard.totalCustomers],
+          ["Active Feedback Loops", dashboard.activeFeedbackLoops],
+          ["Maintenance Loops", dashboard.maintenanceLoops],
+          ["Ended Partnerships", dashboard.endedPartnerships],
+          ["Pending Nominations", dashboard.pendingNominations],
+          ["Ready to Activate", dashboard.readyToActivate],
+          ["Rejected Nominations", dashboard.rejectedNominations],
+          ["Interactions (30 days)", dashboard.interactionsPast30Days],
+          ["Customers at Risk", dashboard.customersAtOverContactRisk],
+        ];
+        document.getElementById("dashboardMetrics").innerHTML = entries
+          .map(
+            ([label, value]) => `
+              <div class="metric">
+                <span class="value">${escapeHtml(value)}</span>
+                <span>${escapeHtml(label)}</span>
+              </div>
+            `,
+          )
+          .join("");
+      }
+
+      function renderCustomerLoad() {
+        document.getElementById("customerLoadRows").innerHTML = state.customers
+          .map((customer) => {
+            const riskClass =
+              customer.relationshipRisk === "High"
+                ? "risk-high"
+                : customer.relationshipRisk === "Medium"
+                  ? "risk-medium"
+                  : "risk-low";
+            return `
+              <tr>
+                <td>${escapeHtml(customer.name)}</td>
+                <td>${escapeHtml(customer.activePartnershipCount)}</td>
+                <td>${escapeHtml(customer.pendingNominationCount)}</td>
+                <td>${escapeHtml(customer.engagementLoad)}</td>
+                <td class="${riskClass}">${escapeHtml(customer.relationshipRisk)}</td>
+                <td>${escapeHtml(asDate(customer.lastInteractionAt))}</td>
+              </tr>
+            `;
+          })
+          .join("");
+      }
+
+      function renderNominationRows() {
+        document.getElementById("nominationRows").innerHTML = state.nominations
+          .map((nomination) => {
+            const approvalCells = ["rd", "cs", "ps"]
+              .map((role) => {
+                const approval = nomination.approvals[role];
+                const badgeClass =
+                  approval.status === "approved"
+                    ? "approved"
+                    : approval.status === "rejected"
+                      ? "rejected"
+                      : "pending";
+
+                const signerMeta = approval.signer
+                  ? `<div>${escapeHtml(approval.signer)} (${escapeHtml(asDate(approval.signedAt))})</div>`
+                  : "";
+                const notes = approval.notes ? `<div>${escapeHtml(approval.notes)}</div>` : "";
+
+                const actionButtons =
+                  nomination.status === "Converted to Partnership"
+                    ? ""
+                    : `
+                      <div class="inline-actions">
+                        <button class="small" data-action="approve" data-id="${escapeHtml(nomination.id)}" data-role="${escapeHtml(role)}">Approve</button>
+                        <button class="small" data-action="reject" data-id="${escapeHtml(nomination.id)}" data-role="${escapeHtml(role)}">Reject</button>
+                      </div>
+                    `;
+
+                return `
+                  <td>
+                    <span class="badge ${badgeClass}">${escapeHtml(approval.status)}</span>
+                    ${signerMeta}
+                    ${notes}
+                    ${actionButtons}
+                  </td>
+                `;
+              })
+              .join("");
+
+            return `
+              <tr>
+                <td>
+                  <div><strong>${escapeHtml(nomination.customerName)}</strong></div>
+                  <div>${escapeHtml(nomination.productTeam)} | ${escapeHtml(nomination.requestedProgramType)}</div>
+                  <div>Requester: ${escapeHtml(nomination.requesterName)} (${escapeHtml(asDate(nomination.requestedAt))})</div>
+                  <div>${escapeHtml(nomination.rationale)}</div>
+                </td>
+                <td><span class="badge ${statusBadgeClass(nomination.status)}">${escapeHtml(nomination.status)}</span></td>
+                ${approvalCells}
+              </tr>
+            `;
+          })
+          .join("");
+      }
+
+      function renderPartnershipRows() {
+        document.getElementById("partnershipRows").innerHTML = state.partnerships
+          .map((partnership) => {
+            const statusOptions = state.partnershipStatuses
+              .map((status) => {
+                const selected = status === partnership.status ? "selected" : "";
+                return `<option ${selected}>${escapeHtml(status)}</option>`;
+              })
+              .join("");
+            const closure = partnership.status === "Ended"
+              ? `${escapeHtml(asDate(partnership.endedAt))}<br/>${escapeHtml(partnership.endReason || "")}`
+              : "-";
+
+            return `
+              <tr>
+                <td>
+                  <strong>${escapeHtml(partnership.customerName)}</strong><br/>
+                  ${escapeHtml(partnership.productTeam)}<br/>
+                  Owner: ${escapeHtml(partnership.owner)}
+                </td>
+                <td>${escapeHtml(partnership.programType)}</td>
+                <td>
+                  <select data-partnership-status="${escapeHtml(partnership.id)}">${statusOptions}</select>
+                </td>
+                <td>
+                  <progress value="${escapeHtml(partnership.phaseProgress)}" max="100"></progress>
+                  ${escapeHtml(partnership.phaseProgress)}%
+                </td>
+                <td>
+                  ${escapeHtml(partnership.feedbackLoopHealth)}<br/>
+                  Target End: ${escapeHtml(asDate(partnership.targetEndDate))}
+                </td>
+                <td>${escapeHtml(partnership.feedbackCadence)}</td>
+                <td>
+                  Last: ${escapeHtml(asDate(partnership.lastInteractionAt))}<br/>
+                  Next: ${escapeHtml(asDate(partnership.nextFollowUpDate))}
+                </td>
+                <td>${closure}</td>
+              </tr>
+            `;
+          })
+          .join("");
+      }
+
+      function renderInteractions() {
+        document.getElementById("interactionRows").innerHTML = state.interactions
+          .map(
+            (interaction) => `
+              <tr>
+                <td>${escapeHtml(interaction.interactionDate)}</td>
+                <td>${escapeHtml(interaction.customerName)} / ${escapeHtml(interaction.productTeam)}</td>
+                <td>${escapeHtml(interaction.channel)}</td>
+                <td>${escapeHtml(interaction.summary)}</td>
+                <td>${escapeHtml(interaction.feedbackSignal)}</td>
+                <td>${escapeHtml(asDate(interaction.nextFollowUpDate))}</td>
+              </tr>
+            `,
+          )
+          .join("");
+      }
+
+      function fillStaticOptions() {
+        const teamOptions = state.productTeams.map((team) => `<option>${escapeHtml(team)}</option>`).join("");
+        const programOptions = state.programDefinitions
+          .map((definition) => `<option>${escapeHtml(definition.label)}</option>`)
+          .join("");
+        const statusOptions = state.partnershipStatuses.map((status) => `<option>${escapeHtml(status)}</option>`).join("");
+
+        document.getElementById("nominationProductTeam").innerHTML = teamOptions;
+        document.getElementById("partnershipProductTeam").innerHTML = teamOptions;
+        document.getElementById("nominationProgramType").innerHTML = programOptions;
+        document.getElementById("partnershipProgramType").innerHTML = programOptions;
+        document.getElementById("partnershipStatus").innerHTML = statusOptions;
+      }
+
+      function fillNominationActivationOptions() {
+        const approved = state.nominations.filter((nomination) => nomination.status === "Approved - Ready to Activate");
+        const options = approved
+          .map(
+            (nomination) => `
+              <option value="${escapeHtml(nomination.id)}">
+                ${escapeHtml(nomination.id)} - ${escapeHtml(nomination.customerName)} (${escapeHtml(nomination.productTeam)})
+              </option>
+            `,
+          )
+          .join("");
+        document.getElementById("partnershipNominationId").innerHTML = `<option value="">None</option>${options}`;
+      }
+
+      function fillInteractionPartnershipOptions() {
+        const options = state.partnerships
+          .map(
+            (partnership) => `
+              <option value="${escapeHtml(partnership.id)}">
+                ${escapeHtml(partnership.customerName)} | ${escapeHtml(partnership.programType)} (${escapeHtml(partnership.id)})
+              </option>
+            `,
+          )
+          .join("");
+        document.getElementById("interactionPartnershipId").innerHTML = options;
+      }
+
+      function renderAll() {
+        fillStaticOptions();
+        fillNominationActivationOptions();
+        fillInteractionPartnershipOptions();
+        renderProgramDefinitions();
+        renderDashboardMetrics();
+        renderCustomerLoad();
+        renderNominationRows();
+        renderPartnershipRows();
+        renderInteractions();
+      }
+
+      async function refreshData() {
+        const snapshot = await api("/api/tracker/bootstrap");
+        Object.assign(state, snapshot);
+        renderAll();
+      }
+
+      async function handleNominationSubmit(event) {
+        event.preventDefault();
+        const payload = formToObject(event.target);
+        await api("/api/nominations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        event.target.reset();
+        await refreshData();
+        showMessage("Nomination submitted.");
+      }
+
+      async function handlePartnershipSubmit(event) {
+        event.preventDefault();
+        const payload = formToObject(event.target);
+        await api("/api/partnerships", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        event.target.reset();
+        await refreshData();
+        showMessage("Partnership saved.");
+      }
+
+      async function handleInteractionSubmit(event) {
+        event.preventDefault();
+        const payload = formToObject(event.target);
+        await api("/api/interactions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        event.target.reset();
+        await refreshData();
+        showMessage("Interaction logged.");
+      }
+
+      async function handleNominationDecision(nominationId, role, status) {
+        const signer = window.prompt(`Signer name for ${ROLE_LABELS[role]} (${status})`);
+        if (signer === null) {
+          return;
+        }
+        const notes = window.prompt("Optional notes for this sign-off:") || "";
+        await api(`/api/nominations/${encodeURIComponent(nominationId)}/signoffs/${encodeURIComponent(role)}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status, signer, notes }),
+        });
+        await refreshData();
+        showMessage(`Nomination ${nominationId} updated by ${ROLE_LABELS[role]}.`);
+      }
+
+      async function handlePartnershipStatusUpdate(partnershipId, status) {
+        const payload = { status };
+        if (status === "Ended") {
+          const endReason = window.prompt("Reason for partnership end:");
+          if (endReason === null) {
+            await refreshData();
+            return;
+          }
+          payload.endReason = endReason.trim() || "No reason provided.";
+          payload.endedAt = new Date().toISOString().slice(0, 10);
+        }
+
+        await api(`/api/partnerships/${encodeURIComponent(partnershipId)}/status`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        await refreshData();
+        showMessage(`Partnership ${partnershipId} moved to "${status}".`);
+      }
+
+      function wireEvents() {
+        document.getElementById("nominationForm").addEventListener("submit", (event) => {
+          handleNominationSubmit(event).catch((error) => showMessage(error.message, true));
+        });
+        document.getElementById("partnershipForm").addEventListener("submit", (event) => {
+          handlePartnershipSubmit(event).catch((error) => showMessage(error.message, true));
+        });
+        document.getElementById("interactionForm").addEventListener("submit", (event) => {
+          handleInteractionSubmit(event).catch((error) => showMessage(error.message, true));
+        });
+
+        document.getElementById("nominationRows").addEventListener("click", (event) => {
+          const target = event.target;
+          if (!(target instanceof HTMLElement)) {
+            return;
+          }
+          const action = target.getAttribute("data-action");
+          const nominationId = target.getAttribute("data-id");
+          const role = target.getAttribute("data-role");
+          if (!action || !nominationId || !role) {
+            return;
+          }
+          const status = action === "approve" ? "approved" : "rejected";
+          handleNominationDecision(nominationId, role, status).catch((error) =>
+            showMessage(error.message, true),
+          );
+        });
+
+        document.getElementById("partnershipRows").addEventListener("change", (event) => {
+          const target = event.target;
+          if (!(target instanceof HTMLSelectElement)) {
+            return;
+          }
+          const partnershipId = target.getAttribute("data-partnership-status");
+          if (!partnershipId) {
+            return;
+          }
+          handlePartnershipStatusUpdate(partnershipId, target.value).catch((error) =>
+            showMessage(error.message, true),
+          );
+        });
+
+        document.getElementById("partnershipNominationId").addEventListener("change", (event) => {
+          const select = event.target;
+          if (!(select instanceof HTMLSelectElement)) {
+            return;
+          }
+          const selectedId = select.value;
+          if (!selectedId) {
+            return;
+          }
+          const nomination = state.nominations.find((item) => item.id === selectedId);
+          if (!nomination) {
+            return;
+          }
+          document.getElementById("partnershipCustomerName").value = nomination.customerName;
+          document.getElementById("partnershipProductTeam").value = nomination.productTeam;
+          document.getElementById("partnershipProgramType").value = nomination.requestedProgramType;
+          document.getElementById("partnershipStatus").value = "Active Feedback Loop";
+        });
+      }
+
+      async function init() {
+        wireEvents();
+        await refreshData();
+        showMessage("Tracker loaded with seeded test data.");
+      }
+
+      init().catch((error) => showMessage(error.message, true));
+    </script>
+  </body>
+</html>
